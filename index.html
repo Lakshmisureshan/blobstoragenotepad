@@ -15,7 +15,7 @@
 <script>
     // REPLACE THESE VALUES WITH YOUR ACTUAL AZURE DETAILS
     const accountName = "mytextstorageapp";
-    const sasToken = "sp=rwl&st=2026-08-01T03:25:00Z&se=2026-08-06T11:40:00Z&spr=https&sv=2026-02-06&sr=c&sig=6Jx1WIhXBETKiPS7yg%2FFPWh14qJXX9dTlFtw%2F7g%2B49s%3D";
+const sasToken = "sp=rwl&st=2026-08-01T03:25:00Z&se=2026-08-06T11:40:00Z&spr=https&sv=2026-02-06&sr=c&sig=6Jx1WIhXBETKiPS7yg%2FFPWh14qJXX9dTlFtw%2F7g%2B49s%3D";
     const containerName = "notes-container";
 
     document.getElementById("uploadBtn").addEventListener("click", async () => {
@@ -33,7 +33,6 @@
 
         try {
             const blobName = `note_${Date.now()}.txt`;
-            // Direct REST API URL for Azure Blob Storage block blob upload
             const cleanSas = sasToken.startsWith('?') ? sasToken : '?' + sasToken;
             const uploadUrl = `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}${cleanSas}`;
 
