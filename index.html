@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Save Text to Azure Blob Storage</title>
-    <!-- Reliable CDN bundle for Azure Storage Blob SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@azure/storage-blob@12.17.0/dist/browser/azure-storage-blob.js"></script>
 </head>
 <body>
 
@@ -17,7 +15,6 @@
 <script>
     // REPLACE THESE VALUES WITH YOUR ACTUAL AZURE DETAILS
     const accountName = "mytextstorageapp";
-    // Use a SAS Token (Shared Access Signature) generated from your Azure Portal
     const sasToken = "sp=rwl&st=2026-08-01T03:25:00Z&se=2026-08-06T11:40:00Z&spr=https&sv=2026-02-06&sr=c&sig=6Jx1WIhXBETKiPS7yg%2FFPWh14qJXX9dTlFtw%2F7g%2B49s%3D";
     const containerName = "notes-container";
 
@@ -35,24 +32,24 @@
         statusEl.innerText = "Uploading...";
 
         try {
-            // Check if the azure SDK loaded properly into window namespace
-            if (typeof azblob === 'undefined') {
-                throw new Error("Azure SDK failed to load into the browser.");
-            }
-
-            // 1. Create the ContainerClient using the SAS URL
-            const containerUrl = `https://${accountName}.blob.core.windows.net/${containerName}?${sasToken}`;
-            const containerClient = new azblob.ContainerClient(containerUrl);
-
-            // 2. Define a unique file name using a timestamp
             const blobName = `note_${Date.now()}.txt`;
-            const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+            // Direct REST API URL for Azure Blob Storage block blob upload
+            const cleanSas = sasToken.startsWith('?') ? sasToken : '?' + sasToken;
+            const uploadUrl = `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}${cleanSas}`;
 
-            // 3. Convert text to a browser Blob and upload
-            const blobData = new Blob([textContent], { type: "text/plain;charset=utf-8" });
+            const response = await fetch(uploadUrl, {
+                method: "PUT",
+                headers: {
+                    "x-ms-blob-type": "BlockBlob",
+                    "Content-Type": "text/plain;charset=utf-8"
+                },
+                body: textContent
+            });
 
-            // uploadBrowserData is optimized for browser usage
-            await blockBlobClient.uploadBrowserData(blobData);
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`Azure Error: ${response.status} - ${errText}`);
+            }
 
             statusEl.style.color = "green";
             statusEl.innerText = `Success! Saved as ${blobName}`;
