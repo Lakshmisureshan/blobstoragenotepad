@@ -1,0 +1,62 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Save Text to Azure Blob Storage</title>
+<!-- Include the Azure Storage Blob SDK for browsers -->
+<script src="https://cdn.jsdelivr.net/npm/@azure/storage-blob@12.17.0/dist/browser/azure-storage-blob.min.js"></script>
+</head>
+<body>
+
+<h2>Save Note to Azure Blob Storage</h2>
+<textarea id="userText" rows="6" cols="50" placeholder="Type your text here..."></textarea><br>
+<button id="uploadBtn">Upload to Azure</button>
+<p id="status" style="font-weight: bold;"></p>
+
+<script>
+// REPLACE THESE VALUES WITH YOUR ACTUAL AZURE DETAILS
+const accountName = "<YOUR_STORAGE_ACCOUNT_NAME>";
+// Use a SAS Token (Shared Access Signature) generated from your Azure Portal
+const sasToken = "<YOUR_SAS_TOKEN>";
+const containerName = "<YOUR_CONTAINER_NAME>";
+
+document.getElementById("uploadBtn").addEventListener("click", async () => {
+const statusEl = document.getElementById("status");
+const textContent = document.getElementById("userText").value;
+
+if (!textContent.trim()) {
+statusEl.innerText = "Please enter some text first.";
+return;
+}
+
+statusEl.innerText = "Uploading...";
+
+try {
+// 1. Create the BlobServiceClient using the SAS URL
+const containerUrl = `https://${accountName}.blob.core.windows.net/${containerName}?${sasToken}`;
+const containerClient = new azblob.ContainerClient(containerUrl);
+
+// 2. Define a unique file name (e.g., using a timestamp)
+const blobName = `note_${Date.now()}.txt`;
+const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+// 3. Convert text to a browser Blob and upload
+const blobData = new Blob([textContent], { type: "text/plain;charset=utf-8" });
+
+// uploadBrowserData is optimized for browsers
+await blockBlobClient.uploadBrowserData(blobData);
+
+statusEl.style.color = "green";
+statusEl.innerText = `Success! Saved as ${blobName}`;
+} catch (error) {
+console.error(error);
+statusEl.style.color = "red";
+statusEl.innerText = "Upload failed. Check console for details.";
+}
+});
+</script>
+
+</body>
+</html>
