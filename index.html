@@ -218,7 +218,7 @@
             left: 0;
             z-index: 9999;
         }
-       
+        
         .top-bar { background: #f0f0f0; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: space-between; padding: 4px 10px; font-size: 13px; user-select: none; }
         .crypto-bar { display: flex; gap: 5px; align-items: center; }
         .crypto-bar input { padding: 2px 6px; font-size: 11px; border: 1px solid #ccc; width: 120px; }
@@ -443,7 +443,6 @@
                 return;
             }
 
-            // Filter out hidden folder files so standard list operations ignore them
             let validBlobs = [];
             for (let i = 0; i < blobs.length; i++) {
                 const bName = blobs[i].getElementsByTagName("Name")[0].textContent;
@@ -512,12 +511,11 @@
 
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                // Using a dot-prefix (.private_folder_) so it acts hidden or isolated from standard views
                 const relativePath = file.webkitRelativePath || file.name;
                 const blobName = `.private_folder_${timestamp}/${relativePath}`;
                 const uploadUrl = `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}${cleanSas}`;
 
-                await fetch(uploadUrl, {
+                const response = await fetch(uploadUrl, {
                     method: "PUT",
                     headers: {
                         "x-ms-blob-type": "BlockBlob",
@@ -525,12 +523,21 @@
                     },
                     body: file
                 });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to upload ${relativePath}`);
+                }
             }
 
             document.getElementById('status').innerText = "Folder Uploaded!";
-            setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
+            setTimeout(() => { 
+                document.getElementById('status').innerText = ""; 
+                event.target.value = ''; 
+            }, 3000);
         } catch (error) {
-            document.getElementById('status').innerText = "Error!";
+            console.log(error);
+            document.getElementById('status').innerText = "Error Uploading!";
+            setTimeout(() => { document.getElementById('status').innerText = ""; }, 3000);
         }
     }
 </script>
