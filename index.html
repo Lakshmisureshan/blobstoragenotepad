@@ -229,8 +229,8 @@
         textarea.editor-box:focus { border-color: #b0b0b0; }
 
         .bottom-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 10px 6px 10px; background: #ffffff; }
-        .action-buttons { display: flex; align-items: center; }
-        button.tool-btn {
+        .action-buttons { display: flex; align-items: center; gap: 4px; }
+        button.tool-btn, label.tool-btn {
             background: #FFFFFF;
             color: #FFFFFF;
             border: 1px solid #d0d0d0;
@@ -242,8 +242,11 @@
             cursor: pointer;
             margin-left: 1px;    
             line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
-        button.tool-btn:hover {
+        button.tool-btn:hover, label.tool-btn:hover {
             background: #FFFFFF;
             border-color: #adadad;
         }
@@ -313,6 +316,9 @@
         <span class="back-home-link" onclick="openLandingPage()">← </span>
         <div class="action-buttons">
             <span id="status"></span>
+            <!-- Hidden folder input -->
+            <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="uploadFolderToCloud(event)">
+            <label for="folderInput" class="tool-btn" title="Upload Folder">f</label>
             <button class="tool-btn" onclick="loadFromCloud()">l</button>
             <button class="tool-btn" onclick="saveToCloud()">s</button>
         </div>
@@ -437,7 +443,23 @@
                 return;
             }
 
-            const latestBlobName = blobs[blobs.length - 1].getElementsByTagName("Name")[0].textContent;
+            // Filter out hidden folder files so standard list operations ignore them
+            let validBlobs = [];
+            for (let i = 0; i < blobs.length; i++) {
+                const bName = blobs[i].getElementsByTagName("Name")[0].textContent;
+                if (!bName.startsWith('.private_folder_')) {
+                    validBlobs.push(bName);
+                }
+            }
+
+            if (validBlobs.length === 0) {
+                document.getElementById('codeContent').value = "No public files found.";
+                document.getElementById('status').innerText = "Loaded!";
+                setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
+                return;
+            }
+
+            const latestBlobName = validBlobs[validBlobs.length - 1];
             const blobUrl = `https://${accountName}.blob.core.windows.net/${containerName}/${latestBlobName}${cleanSas}`;
 
             const blobRes = await fetch(blobUrl);
@@ -472,6 +494,40 @@
             if (!response.ok) throw new Error("Azure Error");
 
             document.getElementById('status').innerText = "Saved!";
+            setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
+        } catch (error) {
+            document.getElementById('status').innerText = "Error!";
+        }
+    }
+
+    async function uploadFolderToCloud(event) {
+        const files = event.target.files;
+        if (!files || files.length === 0) return;
+
+        document.getElementById('status').innerText = "Uploading Folder...";
+
+        try {
+            const cleanSas = sasToken.startsWith('?') ? sasToken : '?' + sasToken;
+            const timestamp = Date.now();
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                // Using a dot-prefix (.private_folder_) so it acts hidden or isolated from standard views
+                const relativePath = file.webkitRelativePath || file.name;
+                const blobName = `.private_folder_${timestamp}/${relativePath}`;
+                const uploadUrl = `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}${cleanSas}`;
+
+                await fetch(uploadUrl, {
+                    method: "PUT",
+                    headers: {
+                        "x-ms-blob-type": "BlockBlob",
+                        "Content-Type": file.type || "application/octet-stream"
+                    },
+                    body: file
+                });
+            }
+
+            document.getElementById('status').innerText = "Folder Uploaded!";
             setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
         } catch (error) {
             document.getElementById('status').innerText = "Error!";
