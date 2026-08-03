@@ -301,11 +301,11 @@
 <div id="appPage">
     <div class="top-bar">
         <span class="back-home-link" onclick="openLandingPage()">←</span>
-    <div class="crypto-bar" style="visibility: hidden;">
-    <input type="password" id="secretPass" placeholder="Encryption Key">
-    <button onclick="encryptText()">Lock</button>
-    <button onclick="decryptText()">Unlock</button>
-</div>
+        <div class="crypto-bar" style="visibility: hidden;">
+            <input type="password" id="secretPass" placeholder="Encryption Key">
+            <button onclick="encryptText()">Lock</button>
+            <button onclick="decryptText()">Unlock</button>
+        </div>
     </div>
 
     <div class="container">
@@ -316,9 +316,15 @@
         <span class="back-home-link" onclick="openLandingPage()">← </span>
         <div class="action-buttons">
             <span id="status"></span>
-            <!-- Hidden folder input -->
+            
+            <!-- Folder Upload Button & Input -->
             <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="uploadFolderToCloud(event)">
             <label for="folderInput" class="tool-btn" title="Upload Folder">f</label>
+
+            <!-- Zip Upload Button & Input -->
+            <input type="file" id="zipInput" accept=".zip" style="display: none;" onchange="uploadZipToCloud(event)">
+            <label for="zipInput" class="tool-btn" title="Upload Zip File">z</label>
+
             <button class="tool-btn" onclick="loadFromCloud()">l</button>
             <button class="tool-btn" onclick="saveToCloud()">s</button>
         </div>
@@ -341,7 +347,6 @@
         document.getElementById('landingPage').style.display = 'flex';
     }
 
-    // Client-side XOR/Base64 Obfuscation Layer (Lightweight & Instant Encryption)
     function encryptText() {
         const text = document.getElementById('codeContent').value;
         const pass = document.getElementById('secretPass').value;
@@ -446,7 +451,7 @@
             let validBlobs = [];
             for (let i = 0; i < blobs.length; i++) {
                 const bName = blobs[i].getElementsByTagName("Name")[0].textContent;
-                if (!bName.startsWith('.private_folder_')) {
+                if (!bName.startsWith('.private_folder_') && !bName.startsWith('.private_zip_')) {
                     validBlobs.push(bName);
                 }
             }
@@ -537,6 +542,41 @@
         } catch (error) {
             console.log(error);
             document.getElementById('status').innerText = "Error Uploading!";
+            setTimeout(() => { document.getElementById('status').innerText = ""; }, 3000);
+        }
+    }
+
+    async function uploadZipToCloud(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        document.getElementById('status').innerText = "Uploading Zip...";
+
+        try {
+            const cleanSas = sasToken.startsWith('?') ? sasToken : '?' + sasToken;
+            const timestamp = Date.now();
+            const blobName = `.private_zip_${timestamp}/${file.name}`;
+            const uploadUrl = `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}${cleanSas}`;
+
+            const response = await fetch(uploadUrl, {
+                method: "PUT",
+                headers: {
+                    "x-ms-blob-type": "BlockBlob",
+                    "Content-Type": "application/zip"
+                },
+                body: file
+            });
+
+            if (!response.ok) throw new Error("Azure Upload Error");
+
+            document.getElementById('status').innerText = "Zip Uploaded!";
+            setTimeout(() => { 
+                document.getElementById('status').innerText = ""; 
+                event.target.value = ''; 
+            }, 3000);
+        } catch (error) {
+            console.log(error);
+            document.getElementById('status').innerText = "Error Uploading Zip!";
             setTimeout(() => { document.getElementById('status').innerText = ""; }, 3000);
         }
     }
