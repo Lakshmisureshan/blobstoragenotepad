@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>    
 <html lang="en">
 <head>
@@ -254,7 +255,8 @@
             background: #FFFFFF;
             border-color: #adadad;
         }
-        #status { color: #d9534f; font-size: 10px; margin-right: 6px; white-space: pre-wrap; word-break: break-all; }
+        /* Changed status color from red (#d9534f) to neutral gray (#777777) */
+        #status { color: #777777; font-size: 10px; margin-right: 6px; white-space: pre-wrap; word-break: break-all; }
         .back-home-link { font-size: 11px; color: #0078d4; cursor: pointer; text-decoration: underline; }
     </style>
 </head>
@@ -542,7 +544,6 @@
                 const file = files[i];
                 const relativePath = file.webkitRelativePath || file.name;
                 
-                // Properly encode path segments to safely handle spaces and special symbols
                 const encodedPath = relativePath.split('/').map(encodeURIComponent).join('/');
                 const blobName = `.private_folder_${timestamp}/${encodedPath}`;
                 const uploadUrl = `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}${cleanSas}`;
