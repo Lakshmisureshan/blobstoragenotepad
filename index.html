@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>    
 <html lang="en">
 <head>
@@ -175,6 +176,8 @@
             margin-top: 15px;
             font-size: 0.85rem;
             color: #4CAF50;
+            white-space: pre-wrap;
+            word-break: break-all;
         }
 
         .enter-btn-corner {
@@ -250,7 +253,7 @@
             background: #FFFFFF;
             border-color: #adadad;
         }
-        #status { color: #666; font-size: 10px; margin-right: 6px; }
+        #status { color: #666; font-size: 10px; margin-right: 6px; white-space: pre-wrap; word-break: break-all; }
         .back-home-link { font-size: 11px; color: #0078d4; cursor: pointer; text-decoration: underline; }
     </style>
 </head>
@@ -416,7 +419,10 @@
                 body: newSubmission
             });
 
-            if (!response.ok) throw new Error("Azure Error");
+            if (!response.ok) {
+                const errorBody = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errorBody}`);
+            }
 
             statusEl.style.color = '#4CAF50';
             statusEl.innerText = "Message sent successfully!";
@@ -427,7 +433,7 @@
             setTimeout(() => { statusEl.innerText = ""; }, 3000);
         } catch (error) {
             statusEl.style.color = '#ff6b6b';
-            statusEl.innerText = "Error sending message!";
+            statusEl.innerText = "Error: " + error.message;
         }
     }
 
@@ -438,7 +444,10 @@
             const listUrl = `https://${accountName}.blob.core.windows.net/${containerName}?restype=container&comp=list${cleanSas.replace('?', '&')}`;
 
             const listRes = await fetch(listUrl);
-            if (!listRes.ok) throw new Error("Failed to list blobs");
+            if (!listRes.ok) {
+                const errorBody = await listRes.text();
+                throw new Error(`HTTP ${listRes.status}: ${errorBody}`);
+            }
             const textData = await listRes.text();
             
             const parser = new DOMParser();
@@ -471,13 +480,17 @@
             const blobUrl = `https://${accountName}.blob.core.windows.net/${containerName}/${latestBlobName}${cleanSas}`;
 
             const blobRes = await fetch(blobUrl);
+            if (!blobRes.ok) {
+                const errorBody = await blobRes.text();
+                throw new Error(`HTTP ${blobRes.status}: ${errorBody}`);
+            }
             const content = await blobRes.text();
 
             document.getElementById('codeContent').value = content;
             document.getElementById('status').innerText = "Loaded!";
             setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
         } catch (error) {
-            document.getElementById('status').innerText = "Error!";
+            document.getElementById('status').innerText = "Error: " + error.message;
         }
     }
 
@@ -499,12 +512,15 @@
                 body: newText
             });
 
-            if (!response.ok) throw new Error("Azure Error");
+            if (!response.ok) {
+                const errorBody = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errorBody}`);
+            }
 
             document.getElementById('status').innerText = "Saved!";
             setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
         } catch (error) {
-            document.getElementById('status').innerText = "Error!";
+            document.getElementById('status').innerText = "Error: " + error.message;
         }
     }
 
@@ -534,7 +550,8 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Failed to upload ${relativePath}`);
+                    const errorBody = await response.text();
+                    throw new Error(`Failed to upload ${relativePath} (HTTP ${response.status}): ${errorBody}`);
                 }
             }
 
@@ -545,8 +562,7 @@
             }, 3000);
         } catch (error) {
             console.log(error);
-            document.getElementById('status').innerText = "Error Uploading!";
-            setTimeout(() => { document.getElementById('status').innerText = ""; }, 3000);
+            document.getElementById('status').innerText = "Error: " + error.message;
         }
     }
 
@@ -571,7 +587,10 @@
                 body: file
             });
 
-            if (!response.ok) throw new Error("Azure Upload Error");
+            if (!response.ok) {
+                const errorBody = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errorBody}`);
+            }
 
             document.getElementById('status').innerText = "Zip Uploaded!";
             setTimeout(() => { 
@@ -580,8 +599,7 @@
             }, 3000);
         } catch (error) {
             console.log(error);
-            document.getElementById('status').innerText = "Error Uploading Zip!";
-            setTimeout(() => { document.getElementById('status').innerText = ""; }, 3000);
+            document.getElementById('status').innerText = "Error: " + error.message;
         }
     }
 
@@ -606,7 +624,10 @@
                 body: file
             });
 
-            if (!response.ok) throw new Error("Azure Upload Error");
+            if (!response.ok) {
+                const errorBody = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errorBody}`);
+            }
 
             document.getElementById('status').innerText = "Rar Uploaded!";
             setTimeout(() => { 
@@ -615,8 +636,7 @@
             }, 3000);
         } catch (error) {
             console.log(error);
-            document.getElementById('status').innerText = "Error Uploading Rar!";
-            setTimeout(() => { document.getElementById('status').innerText = ""; }, 3000);
+            document.getElementById('status').innerText = "Error: " + error.message;
         }
     }
 </script>
