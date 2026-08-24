@@ -442,7 +442,7 @@
         document.getElementById('status').innerText = "Loading...";
         try {
             const cleanSas = sasToken.startsWith('?') ? sasToken : '?' + sasToken;
-            const listUrl = `https://${accountName}.blob.core.windows.net/${containerName}?restype=container&comp=list${cleanSas.replace('?', '&')}`;
+            const listUrl = `https://${accountName}.blob.core.windows.net/${containerName}?restype=container&comp=list&prefix=note_${cleanSas.replace('?', '&')}`;
 
             const listRes = await fetch(listUrl);
             if (!listRes.ok) {
@@ -456,7 +456,7 @@
             const blobs = xmlDoc.getElementsByTagName("Blob");
 
             if (blobs.length === 0) {
-                document.getElementById('codeContent').value = "No files found.";
+                document.getElementById('codeContent').value = "No files starting with 'note_' found.";
                 document.getElementById('status').innerText = "Loaded!";
                 setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
                 return;
@@ -464,14 +464,14 @@
 
             let validBlobs = [];
             for (let i = 0; i < blobs.length; i++) {
-                const bName = blobs[i].getElementsByTagName("Name")[0].textContent;
-                if (!bName.includes('.private_folder_') && !bName.includes('.private_zip_') && !bName.includes('.private_rar_')) {
-                    validBlobs.push(bName);
+                const bNameNode = blobs[i].getElementsByTagName("Name")[0];
+                if (bNameNode) {
+                    validBlobs.push(bNameNode.textContent);
                 }
             }
 
             if (validBlobs.length === 0) {
-                document.getElementById('codeContent').value = "No public files found.";
+                document.getElementById('codeContent').value = "No matching files found.";
                 document.getElementById('status').innerText = "Loaded!";
                 setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
                 return;
