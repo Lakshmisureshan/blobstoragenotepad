@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>    
 <html lang="en">
 <head>
@@ -255,7 +252,6 @@
             background: #FFFFFF;
             border-color: #adadad;
         }
-        /* Changed status color from red (#d9534f) to neutral gray (#777777) */
         #status { color: #777777; font-size: 10px; margin-right: 6px; white-space: pre-wrap; word-break: break-all; }
         .back-home-link { font-size: 11px; color: #0078d4; cursor: pointer; text-decoration: underline; }
     </style>
@@ -469,7 +465,7 @@
             let validBlobs = [];
             for (let i = 0; i < blobs.length; i++) {
                 const bName = blobs[i].getElementsByTagName("Name")[0].textContent;
-                if (!bName.startsWith('.private_folder_') && !bName.startsWith('.private_zip_') && !bName.startsWith('.private_rar_')) {
+                if (!bName.includes('.private_folder_') && !bName.includes('.private_zip_') && !bName.includes('.private_rar_')) {
                     validBlobs.push(bName);
                 }
             }
