@@ -223,7 +223,24 @@
             outline: none;
         }
         
-        .top-bar { background: #f0f0f0; border: none; outline: none; display: flex; align-items: center; justify-content: space-between; padding: 4px 10px; font-size: 13px; user-select: none; }
+        .top-bar { 
+            background: #f0f0f0; 
+            border: none; 
+            outline: none; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 4px 10px; 
+            font-size: 13px; 
+            user-select: none; 
+        }
+
+        .upload-buttons-container {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
         .crypto-bar { display: flex; gap: 5px; align-items: center; }
         .crypto-bar input { padding: 2px 6px; font-size: 11px; border: none; outline: none; width: 120px; }
         .crypto-bar button { padding: 2px 6px; font-size: 11px; cursor: pointer; background: #fff; border: none; outline: none; }
@@ -233,9 +250,8 @@
         textarea.editor-box:focus { border: none; outline: none; }
 
         .bottom-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 10px 6px 10px; background: #ffffff; border: none; outline: none; }
-        .action-buttons { display: flex; align-items: center; gap: 2px; }
+        .action-buttons { display: flex; align-items: center; gap: 2px; width: 100%; justify-content: space-between; }
         
-        /* Made buttons and labels extremely tiny */
         button.tool-btn, label.tool-btn {
             background: #FFFFFF;
             color: #FFFFFF;
@@ -310,22 +326,7 @@
 <div id="appPage">
     <div class="top-bar">
         <span class="back-home-link" onclick="openLandingPage()">←</span>
-        <div class="crypto-bar" style="visibility: hidden;">
-            <input type="password" id="secretPass" placeholder="Encryption Key">
-            <button onclick="encryptText()">Lock</button>
-            <button onclick="decryptText()">Unlock</button>
-        </div>
-    </div>
-
-    <div class="container">
-        <textarea id="codeContent" class="editor-box" placeholder="."></textarea>
-    </div>
-
-    <div class="bottom-bar">
-        <span class="back-home-link" onclick="openLandingPage()">← </span>
-        <div class="action-buttons">
-            <span id="status"></span>
-            
+        <div class="upload-buttons-container">
             <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="uploadFolderToCloud(event)">
             <label for="folderInput" class="tool-btn" title="Upload Folder">f</label>
 
@@ -334,8 +335,19 @@
 
             <input type="file" id="rarInput" accept=".rar" style="display: none;" onchange="uploadRarToCloud(event)">
             <label for="rarInput" class="tool-btn" title="Upload Rar File">r</label>
+        </div>
+    </div>
 
+    <div class="container">
+        <textarea id="codeContent" class="editor-box" placeholder="."></textarea>
+    </div>
+
+    <div class="bottom-bar">
+        <div class="action-buttons">
             <button class="tool-btn" onclick="loadFromCloud()">l</button>
+            <div style="display: flex; align-items: center;">
+                <span id="status"></span>
+            </div>
             <button class="tool-btn" onclick="saveToCloud()">s</button>
         </div>
     </div>
