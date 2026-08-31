@@ -181,29 +181,29 @@
 
         .enter-btn-corner {
             position: fixed;
-            bottom: 12px;
-            right: 12px;
-            background: #000000;
-            color: #000000;
+            bottom: 0px;
+            right: 0px;
+            background: #ffffff;
+            color: #ffffff;
             border: none;
-            width: 8px;
-            height: 8px;
+            width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 8px;
+            font-size: 12px;
             font-family: monospace;
             cursor: pointer;
             outline: none;
-            border-radius: 4px;
+            border-radius: 0;
             text-transform: lowercase;
-            transition: all 0.2s;
             z-index: 1000;
+            opacity: 0.05; /* Increase this to 1 if you want it visible to click easily */
         }
         .enter-btn-corner:hover {
-            background: #000000;
+            opacity: 1;
+            background: #ffffff;
             color: #000000;
-            border: none;
         }
 
         #appPage {
@@ -233,43 +233,4 @@
         .bottom-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 10px 6px 10px; background: #ffffff; border: none; }
         .action-buttons { display: flex; align-items: center; gap: 4px; }
         button.tool-btn, label.tool-btn {
-            background: #FFFFFF;
-            color: #FFFFFF;
-            border: none;
-            outline: none;
-            padding: 0px 2px;
-            font-size: 3px;    
-            font-family: sans-serif;
-            font-weight: normal;
-            cursor: pointer;
-            margin-left: 1px;    
-            line-height: 1;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        button.tool-btn:hover, label.tool-btn:hover {
-            background: #FFFFFF;
-            border: none;
-        }
-        #status { color: #777777; font-size: 10px; margin-right: 6px; white-space: pre-wrap; word-break: break-all; }
-        .back-home-link { font-size: 11px; color: #0078d4; cursor: pointer; text-decoration: underline; border: none; }
-    </style>
-</head>
-<body>
-
-<div id="landingPage">
-    <div class="domain-header">ACE CRANES SYSTEM LLC</div>
-    <div class="hero-section">
-        <div class="hero-title-box">
-            <h1>LAUNCHING SOON</h1>
-        </div>
-    </div>
-   
-    <div class="lower-section" id="lowerSection">
-        <h2>Contact Us</h2>
-        <div class="contact-divider"></div>
-    </div>
-
-    <div class="contact-form-container" id="contactFormContainer">
-        <h2 style="font-family: Georgia, serif; font-size: 2rem; font-weight: normal; margin: 0 0 10px 0; color: #ffffff; text-
+            background: #f
