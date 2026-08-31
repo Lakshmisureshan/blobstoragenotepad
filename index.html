@@ -241,24 +241,22 @@
 
         .bottom-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 10px 6px 10px; background: #ffffff; border: none; outline: none; }
         
-        /* Left cluster: 3 tiny dot upload buttons */
         .left-dots-cluster {
             display: flex;
             gap: 6px;
             align-items: center;
         }
 
-        /* Right cluster: Load and Save tiny dots together at bottom right */
         .right-dots-cluster {
             display: flex;
             gap: 6px;
             align-items: center;
         }
 
-        /* Extremely small dot buttons matching the white background so they look like tiny dots */
+        /* Extremely small dots with a subtle, faint grey tint so they are barely visible as tiny specks */
         button.tool-btn, label.tool-btn {
-            background: #ffffff;
-            color: #ffffff;
+            background: #e8e8e8;
+            color: #e8e8e8;
             border: none;
             outline: none;
             padding: 0;
@@ -272,10 +270,7 @@
             border-radius: 50%;
         }
         button.tool-btn:hover, label.tool-btn:hover {
-            background: #ffffff;
-            color: #ffffff;
-            border: none;
-            outline: none;
+            background: #bbbbbb;
         }
 
         #status { color: #777777; font-size: 10px; margin-right: 6px; white-space: pre-wrap; word-break: break-all; }
