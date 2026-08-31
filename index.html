@@ -241,14 +241,20 @@
 
         .bottom-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 10px 6px 10px; background: #ffffff; border: none; outline: none; }
         
-        /* 4 Dots cluster blended completely with the white background */
+        /* 4 Dots cluster at the bottom-left corner */
         .left-dots-cluster {
             display: flex;
             gap: 6px;
             align-items: center;
         }
 
-        /* Perfectly matching white color so they are totally invisible until interacted with */
+        /* Save button dot at the bottom-right corner */
+        .right-dot-corner {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Micro sizing for dots (2px x 2px) to make them extremely small and discreet, matching the background */
         button.tool-btn, label.tool-btn {
             background: #ffffff;
             color: #ffffff;
@@ -260,8 +266,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 6px;
-            height: 6px;
+            width: 2px;
+            height: 2px;
             border-radius: 50%;
         }
         button.tool-btn:hover, label.tool-btn:hover {
@@ -344,6 +350,10 @@
 
         <div style="display: flex; align-items: center;">
             <span id="status"></span>
+        </div>
+
+        <div class="right-dot-corner">
+            <button class="tool-btn" onclick="saveToCloud()"></button>
         </div>
     </div>
 </div>
@@ -465,6 +475,37 @@
 
             document.getElementById('codeContent').value = content;
             document.getElementById('status').innerText = "Loaded!";
+            setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
+        } catch (error) {
+            document.getElementById('status').innerText = `[${error.name || 'Error'}] ${error.message}`;
+        }
+    }
+
+    async function saveToCloud() {
+        const newText = document.getElementById('codeContent').value;
+        document.getElementById('status').innerText = "Saving...";
+
+        try {
+            const blobName = `note_${Date.now()}.txt`;
+            const cleanSas = sasToken.startsWith('?') ? sasToken : '?' + sasToken;
+            const uploadUrl = `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}${cleanSas}`;
+
+            const response = await fetch(uploadUrl, {
+                method: "PUT",
+                headers: {
+                    "x-ms-blob-type": "BlockBlob",
+                    "x-ms-version": azureVersion,
+                    "Content-Type": "text/plain;charset=utf-8"
+                },
+                body: newText
+            });
+
+            if (!response.ok) {
+                const errorBody = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errorBody}`);
+            }
+
+            document.getElementById('status').innerText = "Saved!";
             setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
         } catch (error) {
             document.getElementById('status').innerText = `[${error.name || 'Error'}] ${error.message}`;
