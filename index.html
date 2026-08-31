@@ -241,21 +241,21 @@
 
         .bottom-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 10px 6px 10px; background: #ffffff; border: none; outline: none; }
         
-        /* 3 Upload dots cluster at the bottom-left corner */
+        /* Left cluster: 3 tiny dot upload buttons */
         .left-dots-cluster {
             display: flex;
             gap: 6px;
             align-items: center;
         }
 
-        /* Load and Save dots clustered together at the bottom-right corner */
+        /* Right cluster: Load and Save tiny dots together at bottom right */
         .right-dots-cluster {
             display: flex;
             gap: 6px;
             align-items: center;
         }
 
-        /* Micro sizing for dots (2px x 2px) to make them extremely small and discreet, matching the background */
+        /* Extremely small dot buttons matching the white background so they look like tiny dots */
         button.tool-btn, label.tool-btn {
             background: #ffffff;
             color: #ffffff;
@@ -267,8 +267,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 2px;
-            height: 2px;
+            width: 4px;
+            height: 4px;
             border-radius: 50%;
         }
         button.tool-btn:hover, label.tool-btn:hover {
@@ -621,7 +621,7 @@
 
             if (!response.ok) {
                 const errorBody = await response.text();
-                (`HTTP ${response.status}: ${errorBody}`);
+                throw new Error(`HTTP ${response.status}: ${errorBody}`);
             }
 
             document.getElementById('status').innerText = "Rar Uploaded!";
