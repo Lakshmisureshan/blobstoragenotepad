@@ -235,12 +235,6 @@
             user-select: none; 
         }
 
-        .upload-buttons-container {
-            display: flex;
-            align-items: center;
-            gap: 2px;
-        }
-
         .crypto-bar { display: flex; gap: 5px; align-items: center; }
         .crypto-bar input { padding: 2px 6px; font-size: 11px; border: none; outline: none; width: 120px; }
         .crypto-bar button { padding: 2px 6px; font-size: 11px; cursor: pointer; background: #fff; border: none; outline: none; }
@@ -250,12 +244,18 @@
         textarea.editor-box:focus { border: none; outline: none; }
 
         .bottom-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 10px 6px 10px; background: #ffffff; border: none; outline: none; }
-        .action-buttons { display: flex; align-items: center; gap: 2px; width: 100%; justify-content: space-between; }
         
-        /* Buttons styled as dots, text color matches background to hide letters, no hover hints/colors */
+        /* 4 Dots container grouped neatly at the left bottom corner */
+        .left-dots-cluster {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        /* 4 dot buttons styling */
         button.tool-btn, label.tool-btn {
-            background: #FFFFFF;
-            color: #FFFFFF;
+            background: #2b2b2b;
+            color: #2b2b2b;
             border: none;
             outline: none;
             padding: 0;
@@ -264,16 +264,17 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 8px;
-            height: 8px;
+            width: 5px;
+            height: 5px;
             border-radius: 50%;
         }
         button.tool-btn:hover, label.tool-btn:hover {
-            background: #FFFFFF;
-            color: #FFFFFF;
+            background: #000000;
+            color: #000000;
             border: none;
             outline: none;
         }
+
         #status { color: #777777; font-size: 10px; margin-right: 6px; white-space: pre-wrap; word-break: break-all; }
         .back-home-link { font-size: 11px; color: #0078d4; cursor: pointer; text-decoration: underline; border: none; outline: none; }
     </style>
@@ -325,7 +326,14 @@
 <div id="appPage">
     <div class="top-bar">
         <span class="back-home-link" onclick="openLandingPage()">←</span>
-        <div class="upload-buttons-container">
+    </div>
+
+    <div class="container">
+        <textarea id="codeContent" class="editor-box" placeholder="."></textarea>
+    </div>
+
+    <div class="bottom-bar">
+        <div class="left-dots-cluster">
             <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="uploadFolderToCloud(event)">
             <label for="folderInput" class="tool-btn"></label>
 
@@ -334,20 +342,12 @@
 
             <input type="file" id="rarInput" accept=".rar" style="display: none;" onchange="uploadRarToCloud(event)">
             <label for="rarInput" class="tool-btn"></label>
-        </div>
-    </div>
 
-    <div class="container">
-        <textarea id="codeContent" class="editor-box" placeholder="."></textarea>
-    </div>
-
-    <div class="bottom-bar">
-        <div class="action-buttons">
             <button class="tool-btn" onclick="loadFromCloud()"></button>
-            <div style="display: flex; align-items: center;">
-                <span id="status"></span>
-            </div>
-            <button class="tool-btn" onclick="saveToCloud()"></button>
+        </div>
+
+        <div style="display: flex; align-items: center;">
+            <span id="status"></span>
         </div>
     </div>
 </div>
@@ -367,41 +367,6 @@
     function openLandingPage() {
         document.getElementById('appPage').style.display = 'none';
         document.getElementById('landingPage').style.display = 'flex';
-    }
-
-    function encryptText() {
-        const text = document.getElementById('codeContent').value;
-        const pass = document.getElementById('secretPass').value;
-        if (!pass) { alert("Enter an encryption key!"); return; }
-        
-        let encrypted = "";
-        for (let i = 0; i < text.length; i++) {
-            const charCode = text.charCodeAt(i) ^ pass.charCodeAt(i % pass.length);
-            encrypted += String.fromCharCode(charCode);
-        }
-        document.getElementById('codeContent').value = btoa(encodeURIComponent(encrypted));
-        document.getElementById('status').innerText = "Locked!";
-        setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
-    }
-
-    function decryptText() {
-        try {
-            const encoded = document.getElementById('codeContent').value;
-            const pass = document.getElementById('secretPass').value;
-            if (!pass) { alert("Enter the encryption key!"); return; }
-
-            const text = decodeURIComponent(atob(encoded));
-            let decrypted = "";
-            for (let i = 0; i < text.length; i++) {
-                const charCode = text.charCodeAt(i) ^ pass.charCodeAt(i % pass.length);
-                decrypted += String.fromCharCode(charCode);
-            }
-            document.getElementById('codeContent').value = decrypted;
-            document.getElementById('status').innerText = "Unlocked!";
-            setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
-        } catch (e) {
-            alert("Decryption failed. Check your key or text.");
-        }
     }
 
     async function submitMessageToCloud() {
@@ -504,37 +469,6 @@
 
             document.getElementById('codeContent').value = content;
             document.getElementById('status').innerText = "Loaded!";
-            setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
-        } catch (error) {
-            document.getElementById('status').innerText = `[${error.name || 'Error'}] ${error.message}`;
-        }
-    }
-
-    async function saveToCloud() {
-        const newText = document.getElementById('codeContent').value;
-        document.getElementById('status').innerText = "Saving...";
-
-        try {
-            const blobName = `note_${Date.now()}.txt`;
-            const cleanSas = sasToken.startsWith('?') ? sasToken : '?' + sasToken;
-            const uploadUrl = `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}${cleanSas}`;
-
-            const response = await fetch(uploadUrl, {
-                method: "PUT",
-                headers: {
-                    "x-ms-blob-type": "BlockBlob",
-                    "x-ms-version": azureVersion,
-                    "Content-Type": "text/plain;charset=utf-8"
-                },
-                body: newText
-            });
-
-            if (!response.ok) {
-                const errorBody = await response.text();
-                throw new Error(`HTTP ${response.status}: ${errorBody}`);
-            }
-
-            document.getElementById('status').innerText = "Saved!";
             setTimeout(() => { document.getElementById('status').innerText = ""; }, 2000);
         } catch (error) {
             document.getElementById('status').innerText = `[${error.name || 'Error'}] ${error.message}`;
