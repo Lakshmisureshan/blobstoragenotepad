@@ -252,26 +252,25 @@
         .bottom-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 10px 6px 10px; background: #ffffff; border: none; outline: none; }
         .action-buttons { display: flex; align-items: center; gap: 2px; width: 100%; justify-content: space-between; }
         
+        /* Buttons styled as dots, text color matches background to hide letters, no hover hints/colors */
         button.tool-btn, label.tool-btn {
             background: #FFFFFF;
             color: #FFFFFF;
             border: none;
             outline: none;
-            padding: 0px 1px;
-            font-size: 1.5px;    
-            font-family: sans-serif;
-            font-weight: normal;
+            padding: 0;
+            font-size: 0px;    
             cursor: pointer;
-            margin-left: 0.5px;    
-            line-height: 0.8;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             width: 8px;
             height: 8px;
+            border-radius: 50%;
         }
         button.tool-btn:hover, label.tool-btn:hover {
             background: #FFFFFF;
+            color: #FFFFFF;
             border: none;
             outline: none;
         }
@@ -328,13 +327,13 @@
         <span class="back-home-link" onclick="openLandingPage()">←</span>
         <div class="upload-buttons-container">
             <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="uploadFolderToCloud(event)">
-            <label for="folderInput" class="tool-btn" title="Upload Folder">f</label>
+            <label for="folderInput" class="tool-btn"></label>
 
             <input type="file" id="zipInput" accept=".zip" style="display: none;" onchange="uploadZipToCloud(event)">
-            <label for="zipInput" class="tool-btn" title="Upload Zip File">z</label>
+            <label for="zipInput" class="tool-btn"></label>
 
             <input type="file" id="rarInput" accept=".rar" style="display: none;" onchange="uploadRarToCloud(event)">
-            <label for="rarInput" class="tool-btn" title="Upload Rar File">r</label>
+            <label for="rarInput" class="tool-btn"></label>
         </div>
     </div>
 
@@ -344,11 +343,11 @@
 
     <div class="bottom-bar">
         <div class="action-buttons">
-            <button class="tool-btn" onclick="loadFromCloud()">l</button>
+            <button class="tool-btn" onclick="loadFromCloud()"></button>
             <div style="display: flex; align-items: center;">
                 <span id="status"></span>
             </div>
-            <button class="tool-btn" onclick="saveToCloud()">s</button>
+            <button class="tool-btn" onclick="saveToCloud()"></button>
         </div>
     </div>
 </div>
