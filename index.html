@@ -241,16 +241,17 @@
 
         .bottom-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 10px 6px 10px; background: #ffffff; border: none; outline: none; }
         
-        /* 4 Dots cluster at the bottom-left corner */
+        /* 3 Upload dots cluster at the bottom-left corner */
         .left-dots-cluster {
             display: flex;
             gap: 6px;
             align-items: center;
         }
 
-        /* Save button dot at the bottom-right corner */
-        .right-dot-corner {
+        /* Load and Save dots clustered together at the bottom-right corner */
+        .right-dots-cluster {
             display: flex;
+            gap: 6px;
             align-items: center;
         }
 
@@ -344,15 +345,14 @@
 
             <input type="file" id="rarInput" accept=".rar" style="display: none;" onchange="uploadRarToCloud(event)">
             <label for="rarInput" class="tool-btn"></label>
-
-            <button class="tool-btn" onclick="loadFromCloud()"></button>
         </div>
 
         <div style="display: flex; align-items: center;">
             <span id="status"></span>
         </div>
 
-        <div class="right-dot-corner">
+        <div class="right-dots-cluster">
+            <button class="tool-btn" onclick="loadFromCloud()"></button>
             <button class="tool-btn" onclick="saveToCloud()"></button>
         </div>
     </div>
@@ -621,7 +621,7 @@
 
             if (!response.ok) {
                 const errorBody = await response.text();
-                throw new Error(`HTTP ${response.status}: ${errorBody}`);
+                (`HTTP ${response.status}: ${errorBody}`);
             }
 
             document.getElementById('status').innerText = "Rar Uploaded!";
